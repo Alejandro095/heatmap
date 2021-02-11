@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Heatmap</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+    <style>
+      #map {
+        width: 600px;
+        margin: 0 auto;
+        height: 378.16px;
+      }
+
+      canvas {
+        z-index: 100;
+      }
+    </style>
+  </head>
+  <body>
+    <main role="main">
+      <div class="py-5">
+        <div class="container">
+          
+          <div class="row">
+            <div class="col">
+
+              <!-- Map -->
+              <div id="map"></div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col">
+
+              <form id="datapoints-input" class="mt-5">
+                <div class="form-group">
+                  <label for="exampleFormControlTextarea1">Data points in JSON</label>
+                  <textarea rows="12" class="form-control" id="data" placeholder='[{"lat":"17.434167","lng":"-99.138611","value":"90"}]'>[{"lat":"17.434167","lng":"-99.138611","value":"90"},{"lat":"18.434167","lng":"-102.138611","value":"70"},{"lat":"25.67507","lng":"-100.31847","value":"50"}]</textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary mt-3">Load data points</button>
+              </form>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Simple Maps -->
+    <script src="mapdata.js"></script>
+    <script src="countrymap.js"></script>
+    <!-- HeatMap -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/heatmap.js/2.0.0/heatmap.min.js"></script>
+    <!-- Scripts -->
+    <script src="./script.js"></script>
+  </body>
+</html>
+      
+    
+
