@@ -170,11 +170,5 @@ var simplemaps_countrymap_mapdata={
       name: "Yucatán"
     }
   },
-  locations: {
-    // "0": {
-    //   lat: "19.434167",
-    //   lng: "-99.138611",
-    //   name: "Mexico City"
-    // }
-  }
+  locations: {}
 };
