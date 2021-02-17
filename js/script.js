@@ -23,15 +23,26 @@ const transformCoordinatesToPixels = (dataPoints, container) => {
   });
 };
 
-const storeData = (heatmapInstance, container) => {
+const storeData = (heatmapInstance, container, maxLocations) => {
   return (locations) => {
-      const coodirnates = transformCoordinatesToPixels(locations, container);
-
-      heatmapInstance.setData({
-          min: 0,
-          max: 100,
-          data: coodirnates,
-      });
+        if(locations.length < maxLocations.length && !locations.length == 0){
+            const allRects = document.querySelectorAll(".sm_location_heatmap");
+            const rect = document.querySelector(`.heatmap_${CSS.escape(locations[0].uniqueId)}`);
+    
+            [...allRects].map(el => el.style.visibility = "hidden");
+            rect.style.visibility = "visible";
+        } else {
+            const allRects = document.querySelectorAll(".sm_location_heatmap");
+            [...allRects].map(el => el.style.visibility = "visible");
+        }
+    
+        const coodirnates = transformCoordinatesToPixels(locations.length == 0 ? maxLocations : locations, container);
+    
+        heatmapInstance.setData({
+            min: 0,
+            max: 100,
+            data: coodirnates,
+        });
   };
 };
 
@@ -107,7 +118,7 @@ function createHeatmap(data, { container, stateInput, townInput, heatmap: initia
   simplemaps_countrymap.hooks.complete = () => {
     // create heatmap with configuration  
     let heatmapInstance = h337.create(InitialConfigurationsHeatmap);
-    let setData = storeData(heatmapInstance, container);
+    let setData = storeData(heatmapInstance, container, locations);
 
     setData(locations);
 
