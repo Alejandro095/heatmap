@@ -1,0 +1,18 @@
+#map {
+  width: 600px;
+  margin: 0 auto;
+  height: 378.16px;
+}
+
+canvas {
+  z-index: 100;
+  pointer-events: none;
+}
+
+#tt_sm_map {
+  z-index: 200 !important;
+}
+
+.sm_location_heatmap {
+  opacity: 0 !important;
+}
