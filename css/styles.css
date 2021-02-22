@@ -1,18 +1,83 @@
-#map {
-  width: 600px;
+/*
+    1. Posicionamiento
+    2. Box model
+    2. Tipografia
+    4. Visuales
+    5. Otros
+*/
+
+*, *::after, *::before {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+  background-color: #f3f2f0;
+}
+
+/* Remove trial */
+text[href="http://simplemaps.com"] {
+  display: none !important;
+}
+
+.controls--help {
+  width: 2rem;
+  line-height: 2rem;
+
+  border-radius: 2rem;
+  background-color: #0B438C;
+  color: white;
+  text-align: center;
+  vertical-align:middle;
+}
+
+section .controls {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+ 
+  padding: 1rem;
+}
+
+section .controls select {
+  padding: 0.25rem;
+  border: none;
+  cursor: pointer;
+
+  border-radius: 1rem;
+  
+  outline: none;
+}
+
+section .controls option {
+  background-color: #0B438C;
+  color: white;
+}
+
+section .controls select::-webkit-scrollbar {
+  width: 0.5rem;
+}
+
+section .controls select::-webkit-scrollbar-track {
+  border: none;
+  background-color: #0B438C;
+}
+
+section .controls select::-webkit-scrollbar-thumb {
+  background-color: #3677ef;
+  border-radius: 1rem;
+}
+
+section .controls span {
+  align-self: flex-end;
+}
+
+.map-container #map {
   margin: 0 auto;
-  height: 378.16px;
-}
-
-canvas {
-  z-index: 100;
-  pointer-events: none;
-}
-
-#tt_sm_map {
-  z-index: 200 !important;
-}
-
-.sm_location_heatmap {
-  opacity: 0 !important;
 }
