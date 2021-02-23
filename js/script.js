@@ -7,19 +7,44 @@ const getColor = (value) => {
         case "in_progress":
             return "#FC541F"
         case "uncertified":
-            return "#F83527"
+            return "#000"
         default:
-            break;
+            return "#fff"
     }
 }
 
 const createLocationsOnMap = (locations) => {
     const locationsObject = {};
-
+    /**
+     * The following function converts the information (array) into an object 
+     * that is then passed to simplemaps
+     */
     locations.forEach((location) => {
         const key = `map_point point_${Math.random()}`;
         locationsObject[key] = {
             ...location,
+            /**
+             * The description property carries the 
+             * html structure of the pop-up
+             */
+            description: `
+                <div class="pop-up">
+                    <div class="section">
+                        <div class="title"> CENTRO PENINTENCIARO </div>
+                        <div class="content">
+                            <div class="icon"> Icon </div>
+                            <div class="info"> ${location.name} </div>
+                        </div>
+                    </div>
+                    <div class="section">
+                        <div class="title"> RESULTADO GLOBAL </div>
+                        <div class="content">
+                            <div class="icon"> Icon </div>
+                            <div class="info"> ${location.description} </div>    
+                        </div>
+                    </div>
+                </div>
+            `,
             key,
             opacity: 1,
             border_color: "#f3f2f0",
@@ -35,7 +60,10 @@ const createLocationsOnMap = (locations) => {
 const mapInitialData = (data, statesIds) => {
     let objectNewData = {};
 
-    /** Map data */
+    /**
+     * The function converts the data into an array and 
+     * adds its penitentiaries to it.
+     */
     Object.entries(statesIds).map(([key, { name }]) => {
         objectNewData[key] = {
             name,
@@ -43,6 +71,10 @@ const mapInitialData = (data, statesIds) => {
         }
     })
     
+    /**
+     * The function hides the locations with the simeplemaps API 
+     * and refreshes the map
+     */
     const hideElements = (search, showFunction) => {
         if(search) {
             Object.entries(data).forEach(([_, el]) => el.hide = "yes");
@@ -50,44 +82,71 @@ const mapInitialData = (data, statesIds) => {
         } else {
             Object.entries(data).forEach(([_, el]) => el.hide = "no");
         }
-
         simplemaps_countrymap.refresh();
     }
     
-    /** Exposed API */
-    return  (state = undefined, penitentiary = undefined) => {
-        try {
-            if(state && penitentiary) {
+    return  {
+        /**
+         * The exposed function hides all the locations 
+         * with the established parameter.
+         */
+        hideElements: (status) => {
+            Object.entries(data).forEach(([_, el]) => {
+                el.hide = "yes";
 
-                const search = objectNewData[state].penitentiaries.filter(({ name }) => name === penitentiary )[0];
-                hideElements(search, () => data[search.key].hide = "no")
+                if(el.status == status || status == "all") {
+                    el.hide = "no";
+                }
+            });
+            simplemaps_countrymap.refresh();
+        },
 
-                return search;
+        /**
+         * The exposed function filters all the locations 
+         * with the established parameters.
+         */
+        filter: (state = undefined, penitentiary = undefined) => {
+            try {
 
-            } else if (state) {
-                const search = objectNewData[state]
-                hideElements(search, () => {
-                    search.penitentiaries.forEach(({key}) => {
-                        data[key].hide = "no"
+                // Filter by state and prison
+                if(state && penitentiary) {
+                    const search = objectNewData[state].penitentiaries.filter(({ name }) => name === penitentiary )[0];
+                    hideElements(search, () => data[search.key].hide = "no")
+
+                    return search;    
+                } else if (state) {
+                    // Filter by state
+                    const search = objectNewData[state]
+                    hideElements(search, () => {
+                        search.penitentiaries.forEach(({key}) => {
+                            data[key].hide = "no"
+                        })
                     })
-                })
-
-                return objectNewData[state].penitentiaries || [];
-
-            } else {
-
-                /** A lot of refresh useless */
-                Object.entries(data).map(([_, el]) => el.hide = "no");
-                simplemaps_countrymap.refresh();
-
-                return Object.entries(objectNewData).map(([key, {name}]) =>{
-                    return {
-                        key, name
-                    }
-                });
-            }   
-        } catch (error) {
-            simplemaps_countrymap.back()
+    
+                    return objectNewData[state].penitentiaries || [];
+                } else {
+                    /**
+                     * In case the state and prison parameters are undefined, 
+                     * all the locations will be shown and the initial 
+                     * information will be returned.
+                     */
+                    Object.entries(data).map(([_, el]) => el.hide = "no");
+                    simplemaps_countrymap.refresh();
+    
+                    return Object.entries(objectNewData).map(([key, {name}]) =>{
+                        return {
+                            key, name
+                        }
+                    });
+                }   
+            } catch (error) {
+                /**
+                 * If the value does not exist or there is an error, 
+                 * the initial data will be returned and all the 
+                 * locations will be displayed.
+                 */
+                simplemaps_countrymap.back()
+            }
         }
     }
 
@@ -95,13 +154,14 @@ const mapInitialData = (data, statesIds) => {
 
 const createOptionElement = ({key, name}) => {
     const option = document.createElement("option");
+    // Check which key to use depending on the length of the string
     option.setAttribute("value", key && key.length == 7 ? key : name);
     option.textContent = name;
 
     return option;
 }
 
-const insertOptionsElements = (optionsData = [], target, type = "municipio") => {
+const insertOptionsElements = (optionsData = [], target, type = "estado") => {
 
     /** Remove all options */
     while(target.childNodes.length) {
@@ -127,55 +187,112 @@ const removeSelected = (nodes, id) => {
     });
 }
 
-function createHeatmap(data, { stateInput, townInput }) {
+const createChart = (data) => {
+    /**
+     * This function converts the array of prisons into an array 
+     * with the number of prisons filtered by the status property
+     */
+    const mapData = (penitentiariesData) => {
+        const placeHolder = {
+            certificate: 0,
+            denied: 0,
+            in_progress: 0,
+            uncertified: 0
+        };
+        penitentiariesData.forEach((el) => placeHolder[el.status]++ );
+        return Object.values(placeHolder);
+    }
+    
+    // Map initial data
+    const initialData = mapData(data);
+    const htmlTitle = document.querySelector(".chart-title");
+
+    // Create Doughnut and Pie chart with Chart.js
+    const chart =  new Chart(document.getElementById("doughnut-chart"), {
+        type: 'doughnut',
+        data: {
+          labels: ["Certificado", "Denegado", "En proceso", "Sin certificar"],
+          datasets: [{
+              backgroundColor: ["#4DBF3B", "#F83527","#FC541F","#000"],
+              data: initialData,
+            }]
+        },
+        options: {
+          title: false,
+          legend: false,
+        }
+    });
+
+    return {
+        /**
+         * The following function updates the graph 
+         * and renames the span (the title).
+         */
+        update: (data = undefined, title) => {
+            htmlTitle.innerText = title;
+            chart.data.datasets[0].data = typeof data === "undefined" ? initialData : mapData(data);
+            chart.update();
+        }
+    }
+}
+
+function createMap(data, { stateInput, penitentiariesInput, filterInput }) {
+    // Create locations on map
     createLocationsOnMap(data);
     simplemaps_countrymap.load()
     simplemaps_countrymap.hooks.complete = () => {
-
-        const filter =  mapInitialData(simplemaps_countrymap_mapdata.locations, simplemaps_countrymap_mapdata.state_specific);
+        // Mapdata simplemaps locations and return functions to filter.
+        const { filter, hideElements} =  mapInitialData(simplemaps_countrymap_mapdata.locations, simplemaps_countrymap_mapdata.state_specific);
+        // Create chart
+        const { update } = createChart(Object.values(simplemaps_countrymap_mapdata.locations));
+        // Get initial data without filters
         const initialStates = filter();
 
-        // Render first locations
+        // Insert options elements of states
         insertOptionsElements(initialStates, stateInput);
 
         const handlerStateInput = () => {
             const penitentiaries = filter(stateInput.value);
-            insertOptionsElements(penitentiaries, townInput);
+            
+            // Insert options elements of penitentiaries 
+            insertOptionsElements(penitentiaries, penitentiariesInput, "penitenciaria");
             simplemaps_countrymap.state_zoom(stateInput.value);
+            // Update chart
+            update(penitentiaries, simplemaps_countrymap_mapdata.state_specific[stateInput.value].name)
         }
 
         const handlerPenitentiariesInput = () => {
-            filter(stateInput.value, townInput.value);
+            filter(stateInput.value, penitentiariesInput.value);
+        }
+
+        const handlerFilterInput = () => {
+            hideElements(filterInput.value)
         }
 
         simplemaps_countrymap.hooks.back = () => {
+            // Filter all prisons and refresh
             filter()
-            insertOptionsElements([], townInput);
+            // Insert options elements of states
+            insertOptionsElements(initialStates, stateInput);
+            // Insert options elements of penitentiaries
+            insertOptionsElements([], penitentiariesInput, "penitenciaria");
+            // Update chart with initialStates has default data
+            update(undefined, "Nacional")
         };
         simplemaps_countrymap.hooks.zoomable_click_state = (id) => {
+            // Add the selected attribute to the chosen option and remove the previous ones
             removeSelected(stateInput.childNodes, id);
             handlerStateInput();
         } ; 	
-        
+
+        // Events
         stateInput.addEventListener("change", handlerStateInput);
-        townInput.addEventListener("change", handlerPenitentiariesInput)
+        penitentiariesInput.addEventListener("change", handlerPenitentiariesInput);
+        filterInput.addEventListener("change", handlerFilterInput)
     };
 }
 
-/**
- * 
- * 
- * 
- * 
- * 
- * 
- * 
- * 
- */
-
-// -----------------------------------------------
-
-// copy(datos.map((el, index) => {
+// copy(data.map((el, index) => {
 //     return {
 //         name: el.name + " " + index + 100,
 //         description: el.description,
@@ -185,193 +302,4 @@ function createHeatmap(data, { stateInput, townInput }) {
 //         lat: el.lat,
 //         lng: el.lng
 //     }
-// }))
-
-// ----------------------------------------------------
-
-// const createLocationsOnMap = (locations) => {
-//     const locationsObject = {};
-//     const ids = [];
-
-//     const getColor = (value) => {
-//         switch (value) {
-//             case "certificate":
-//                 return "#4DBF3B"
-//             case "denied":
-//                 return "#F83527"
-//             case "in_progress":
-//                 return "#FC541F"
-//             case "uncertified":
-//                 return "#F83527"
-//             default:
-//                 break;
-//         }
-//     }
-
-//     locations.forEach((location) => {
-//         const uniqueId = Math.random();
-//         locationsObject[`heatmap heatmap_${uniqueId}`] = {
-//             ...location,
-//             opacity: 1,
-//             border_color: "#f3f2f0",
-//             border: 1.5,
-//             type: "circle",
-//             color: getColor(location.value)
-//         };
-//         ids.push({ id: uniqueId, location})
-//     });
-
-//     simplemaps_countrymap_mapdata.locations = locationsObject;
-
-//     return ids;
-// }
-
-// const storeData = (heatmapInstance, container, maxLocations) => {
-//   return (locations) => {
-//         if(locations.length < maxLocations.length && !locations.length == 0){
-//             const allRects = document.querySelectorAll(".sm_location_heatmap");
-//             const rect = document.querySelector(`.heatmap_${CSS.escape(locations[0].uniqueId)}`);
-    
-//             [...allRects].map(el => el.style.visibility = "hidden");
-//             rect.style.visibility = "visible";
-//         } else {
-//             const allRects = document.querySelectorAll(".sm_location_heatmap");
-//             [...allRects].map(el => el.style.visibility = "visible");
-//         }
-    
-//         const coodirnates = transformCoordinatesToPixels(locations.length == 0 ? maxLocations : locations, container);
-    
-//         heatmapInstance.setData({
-//             min: 0,
-//             max: 100,
-//             data: coodirnates,
-//         });
-//   };
-// };
-
-// const createElement = (el, container) => {
-//     const element = document.createElement("option");
-//     element.setAttribute("value", el.id);
-//     element.textContent = el.name;
-
-//     container.appendChild(element);
-// };
-
-// const createElements = (elements, container) => {
-
-//   while (container.childNodes.length) {
-//       container.removeChild(container.lastChild);
-//   }
-
-// //   console.log(elements)
-
-//   if (elements && elements.length === 0) {
-//       createElement({ id: "NO_EXISTS", name: "Sin ciudades" }, container);
-//   } else if (elements) {
-//       createElement({ id: "NO_EXISTS", name: "Seleccionar municipio." }, container);
-//       elements.forEach(el => createElement(el, container));
-//   } else {
-//       createElement({ id: "NO_EXISTS", name: "Seleccionar municipio." }, container);
-//   }
-// };
-
-// const removeSelected = (nodes, id) => {
-//     [...nodes].map((el) => {
-//         if (el.getAttribute("value") === id) {
-//             el.setAttribute("selected", "");
-//         } else {
-//             el.removeAttribute("selected");
-//         }
-//     });
-// }
-
-// function createHeatmap(data, { container, stateInput, townInput, heatmap: initialConfigurationsHeatmap }) {
-//   const locations = createLocationsOnMap(data);
-
-//   const statesId = Object.entries(simplemaps_countrymap_mapdata.state_specific)
-//                     .map(([key, { name }]) => ({ id: key, name }));
-
-//   const towsAvailable = (() => {
-//     const towns = {};
-    
-//     statesId.forEach(({ name, id }) => {
-//         towns[id] = data
-//                     .filter((el) => el.admin_name == name)
-//                     .map(({ city: name }) => ({ id: name, name }));
-//     });
-//     return towns;
-//   })();
-
-//     //   const InitialConfigurationsHeatmap = {
-//     //       container,
-//     //       radius: 10,
-//     //       maxOpacity: 0.5,
-//     //       minOpacity: 0,
-//     //       blur: 0.75,
-
-//     //       ...initialConfigurationsHeatmap,
-//     //   };
-
-//     // Render first locations
-//   createElements(statesId, stateInput);
-
-//   /**
-//    * This function is called after the map has finished loading.
-//    */
-//   simplemaps_countrymap.load()
-//   simplemaps_countrymap.hooks.complete = () => {
-//     // create heatmap with configuration  
-//     // let heatmapInstance = h337.create(InitialConfigurationsHeatmap);
-//     // let setData = storeData(heatmapInstance, container, locations);
-
-//     // setData(locations);
-
-//     // simplemaps_countrymap.hooks.zooming_complete = () => setData(locations);
-//     // simplemaps_countrymap.hooks.zoomable_click_state = (id) => {
-//     //     createElements(towsAvailable[id], townInput);
-//     //     removeSelected(stateInput.childNodes, id);
-//     // };
-   
-//     // State change event
-//     // stateInput.addEventListener("change", () => {    
-//     //     createElements(towsAvailable[stateInput.value], townInput);
-//     //     removeSelected(stateInput.childNodes, stateInput.value);
-//     //     if(stateInput.value != "NO_EXISTS") {
-//     //         simplemaps_countrymap.state_zoom(stateInput.value);
-//     //     } else {
-//     //         simplemaps_countrymap.back();
-//     //     }
-//     // });
-
-//     // Town change event
-//     // townInput.addEventListener("change", () => {
-//     //     setData(locations.filter((el) => el.city == townInput.value)); 
-//     // });
-//   };
-// }
-
-
-
-// // copy(data.map(el => {
-// //     return {
-// //         ...el,
-// //         value: (() => {
-// //             function getRandomInt(min, max) {
-// //                 return Math.floor(Math.random() * (max - min)) + min;
-// //             }
-
-// //             switch (getRandomInt(1, 5)) {
-// //                 case 1:
-// //                     return "certificate";
-// //                 case 2:
-// //                     return "denied";
-// //                 case 3:
-// //                     return "in_progress";
-// //                 default:
-// //                     return "uncertified";
-// //             }
-// //         })(),
-// //         name: "Test",
-// //         description: "test description"
-// //     }
-// // }))
+// }));

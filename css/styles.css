@@ -1,11 +1,6 @@
-/*
-    1. Posicionamiento
-    2. Box model
-    2. Tipografia
-    4. Visuales
-    5. Otros
+/* 
+  GENERAL STYLES
 */
-
 *, *::after, *::before {
   box-sizing: border-box;
   margin: 0;
@@ -25,16 +20,56 @@ text[href="http://simplemaps.com"] {
   display: none !important;
 }
 
-.controls--help {
-  width: 2rem;
-  line-height: 2rem;
 
-  border-radius: 2rem;
-  background-color: #0B438C;
-  color: white;
-  text-align: center;
-  vertical-align:middle;
+/* 
+ *  CONTAINER STYLES
+ */
+
+#map {
+  position: relative;
 }
+
+.container {
+  width: 900px;
+  margin: 0 auto;
+}
+
+.map-container #map {
+  margin: 0 auto;
+}
+
+
+/* 
+ *  CHART STYLES
+ */
+#map .chart {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  z-index: 1000;
+  width: 10rem;
+  height: 10rem;
+}
+
+#map .chart #doughnut-chart {
+  width: 100%;
+  height: 100%;
+}
+
+#map .chart > div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#map .chart .chart-title {
+  position: absolute;
+  font-size: 0.75rem;
+}
+
+/* 
+ *  SECTION CONTROLS STYLES
+ */
 
 section .controls {
   width: 100%;
@@ -42,11 +77,24 @@ section .controls {
   justify-content: space-between;
   align-items: center;
  
-  padding: 1rem;
+  margin: 2rem 0;
+}
+
+section .controls .controls-help {
+  width: 2rem;
+  height: 2rem;
+  line-height: 2rem;
+  text-align: center;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  background-color: #0B438C;
+  border-radius: 100%;
 }
 
 section .controls select {
-  padding: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  margin-right: 0.75rem;
   border: none;
   cursor: pointer;
 
@@ -78,6 +126,92 @@ section .controls span {
   align-self: flex-end;
 }
 
-.map-container #map {
-  margin: 0 auto;
+
+/* 
+ *  SECTION LEGENDS STYLES
+ */
+
+.legends {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin-top: 2rem;
+}
+
+.legends > span {
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+}
+
+.legends span .color {
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-right: 0.5rem;
+
+  display: inline-flex;
+  border-radius: 10rem;
+}
+
+.legends span:nth-child(1) .color {
+background-color: #4DBF3B;
+}
+
+.legends span:nth-child(2) .color {
+  background-color: #F83527;
+}
+
+.legends span:nth-child(3) .color {
+  background-color: #FC541F;
+}
+
+.legends span:nth-child(4) .color {
+  background-color: #000;
+}
+#tt_sm_map .tt_sm > div:first-child {
+  display: none !important;
+}
+
+
+/* 
+ *  POP-UP STYLES
+ */
+.pop-up {
+  width: 18rem;
+  border: 2px solid #0B438C;
+  background-color: white;
+}
+
+.pop-up div {
+  width: 100%;
+}
+
+.pop-up .section {
+  display: flex;
+  flex-flow: column wrap;
+  justify-content: stretch;
+}
+
+.pop-up .section .title {
+  background-color: #0B438C;
+  color: white;
+  padding: 0.4rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.pop-up .section .content {
+  display: flex;
+  min-height: 4rem;
+}
+
+.pop-up .section .content div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pop-up .section .content div:first-child {
+  flex-basis: 45%;
+  border-right: 2px solid #0B438C;
 }

@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-    <title>Heatmap</title>
+    <title>Map</title>
     <link rel="stylesheet" href="./css/styles.css">
   </head>
   <body>
     <main role="main">
-      <section>
+      <section class="container">
         
         <!-- Controls -->
         <div class="controls">
@@ -16,45 +16,55 @@
               <option value="" selected disabled hidden>Entidad</option>
             </select>
   
-            <select id="input">
+            <select id="penitentiariesInput">
               <option value="" selected disabled hidden>Centro penitenciario</option>
             </select>
   
-            <select id="">
-              <option value="" selected disabled hidden>Estatus de certificación</option>
-              <option value="Option 2">Option 2</option>
-              <option value="Option 3">Option 3</option>
-              <option value="Option 4">Option 4</option>
-              <option value="Option 5">Option 5</option>
-              <option value="Option length">Option that has too long of a value to fit</option>
+            <select id="filterInput">
+              <option value="all" selected>Estatus de certificación</option>
+              <option value="certificate">Certificado</option>
+              <option value="denied">Denegado</option>
+              <option value="in_progress">En proceso</option>
+              <option value="uncertified">Sin certificar</option>
             </select>
   
           </div>
           
-          <span class="controls--help">?</span>
+          <span class="controls-help">?</span>
         </div>
         
         <!-- Map -->
         <div class="map-container">
-          <div id="map"></div>
+          <div id="map">
+            
+            <!-- Chart -->
+            <div class="chart">  
+              <div>
+                <span class="chart-title">Nacional</span>
+                <canvas id="doughnut-chart"></canvas>
+              </div>
+            </div>
+          </div>
         </div>
         
         <!-- Legends -->
-        <div>
-          <span>Certificado</span>
-          <span>Denegado</span>
-          <span>En proceso</span>
-          <span>Sin certificar</span>
+        <div class="legends">
+          <span><span class="color"></span>Certificado</span>
+          <span><span class="color"></span>Denegado</span>
+          <span><span class="color"></span>En proceso</span>
+          <span><span class="color"></span>Sin certificar</span>
         </div>
       </section>
+
+
     </main>
 
     <!-- Simple Maps -->
     <script src="./js/mapdata.js"></script>
-    <script src="./js/countrymap.js"></script>
+    <script src="./js/lib/countrymap.js"></script>
     <script src="./js/data.js"></script>
-    <!-- HeatMap -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/heatmap.js/2.0.0/heatmap.min.js"></script>
+    <!-- ChartJS -->
+    <script src="./js/lib/chart.js"></script>
     <!-- Scripts -->
     <script src="./js/script.js"></script>
     <!-- Run script -->
@@ -62,15 +72,24 @@
       const container = document.querySelector("#map");
 
       const stateInput = document.querySelector("#stateInput");
-      const townInput = document.querySelector("#input");
+      const penitentiariesInput = document.querySelector("#penitentiariesInput");
+      const filterInput = document.querySelector("#filterInput");
 
-      createHeatmap(data, {
-        // Container for render
+      /*
+      *  El argumento "data" pasado a la funcion createMap es una
+      *  variable global inicializada en el archivo data.js.
+      *  Aun asi se puede pasar directamento los valores sin necesidad
+      *  de crear una varible.
+      */
+
+      createMap(data, {
+        // Map container
         container,
 
         // Inputs
         stateInput,
-        townInput,
+        penitentiariesInput,
+        filterInput,
       });
     </script>
   </body>
