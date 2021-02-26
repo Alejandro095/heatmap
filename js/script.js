@@ -1,15 +1,54 @@
-const getColor = (value) => {
-    switch (value) {
-        case "certificate":
-            return "#4DBF3B"
-        case "denied":
-            return "#F83527"
-        case "in_progress":
-            return "#FC541F"
-        case "uncertified":
-            return "#000"
-        default:
-            return "#fff"
+const STATESIDs = {
+    1: "Aguascalientes",
+    2: "Baja California",
+    3: "Baja California Sur",
+    4: "Campeche",
+    5: "Chiapas",
+    6: "Chihuahua",
+    7: "Distrito Federal",
+    8: "Coahuila",
+    9: "Colima",
+    10: "Durango",
+    11: "Guanajuato",
+    12: "Guerrero",
+    13: "Hidalgo",
+    14: "Jalisco",
+    15: "México",
+    16: "Michoacán",
+    17: "Morelos",
+    18: "Nayarit",
+    19: "Nuevo León",
+    20: "Oaxaca",
+    21: "Puebla",
+    22: "Querétaro",
+    23: "Quintana Roo",
+    24: "San Luis Potosí",
+    25: "Sinaloa",
+    26: "Sonora",
+    27: "Tabasco",
+    28: "Tamaulipas",
+    29: "Tlaxcala",
+    30: "Veracruz",
+    31: "Yucatán",
+    32: "Zacatecas"
+}
+
+const ColoresCertificacionID = {
+    1: {
+        name: "uncertified",
+        color: "#000"
+    },
+    2: {
+        name: "in_progress",
+        color: "#FC541F"
+    },
+    3: {
+        name: "denied",
+        color: "#F83527"
+    },
+    4: {
+        name: "certificate",
+        color: "#4DBF3B"
     }
 }
 
@@ -23,6 +62,11 @@ const createLocationsOnMap = (locations) => {
         const key = `map_point point_${Math.random()}`;
         locationsObject[key] = {
             ...location,
+            state: STATESIDs[location.entidadID],
+            name: location.PenitenciarioCEDesc,
+            status: ColoresCertificacionID[location.certificacionID].name,
+            lat: location.latitud || location.lat,
+            lng: location.longitud || location.lng,
             /**
              * The description property carries the 
              * html structure of the pop-up
@@ -32,15 +76,18 @@ const createLocationsOnMap = (locations) => {
                     <div class="section">
                         <div class="title"> CENTRO PENINTENCIARO </div>
                         <div class="content">
-                            <div class="icon"> Icon </div>
-                            <div class="info"> ${location.name} </div>
+                            <div class="Icono"> Icon </div>
+                            <div class="info"> ${location.PenitenciarioCEDesc} </div>
                         </div>
                     </div>
                     <div class="section">
                         <div class="title"> RESULTADO GLOBAL </div>
                         <div class="content">
                             <div class="icon"> Icon </div>
-                            <div class="info"> ${location.description} </div>    
+                            <div class="info">
+                                <div>Icono</div>
+                                <div>${location.certificacionDesc || "Sin dato"}</div>
+                            </div>    
                         </div>
                     </div>
                 </div>
@@ -50,10 +97,9 @@ const createLocationsOnMap = (locations) => {
             border_color: "#f3f2f0",
             border: 1.5,
             type: "circle",
-            color: getColor(location.status)
+            color: ColoresCertificacionID[location.certificacionID].color
         };
     });
-
     simplemaps_countrymap_mapdata.locations = locationsObject;
 }
 
@@ -291,15 +337,3 @@ function createMap(data, { stateInput, penitentiariesInput, filterInput }) {
         filterInput.addEventListener("change", handlerFilterInput)
     };
 }
-
-// copy(data.map((el, index) => {
-//     return {
-//         name: el.name + " " + index + 100,
-//         description: el.description,
-//         state: el.admin_name,
-//         status: el.value,
-//         city: el.city,
-//         lat: el.lat,
-//         lng: el.lng
-//     }
-// }));

@@ -93,6 +93,7 @@ section .controls .controls-help {
 }
 
 section .controls select {
+  max-width: 400px;
   padding: 0.25rem 0.5rem;
   margin-right: 0.75rem;
   border: none;
@@ -177,7 +178,8 @@ background-color: #4DBF3B;
  *  POP-UP STYLES
  */
 .pop-up {
-  width: 18rem;
+  min-width: 20rem;
+  max-width: 32rem;
   border: 2px solid #0B438C;
   background-color: white;
 }
@@ -211,7 +213,28 @@ background-color: #4DBF3B;
   align-items: center;
 }
 
-.pop-up .section .content div:first-child {
-  flex-basis: 45%;
+.pop-up .section .content > div:first-child {
+  flex-basis: 8.25rem;
   border-right: 2px solid #0B438C;
+}
+
+.pop-up .section .content .info {
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+}
+
+.pop-up .section:first-child .content {
+  color: #FC541F;
+}
+
+.pop-up .section:last-child .content .info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.pop-up .section:last-child .content .info > div {
+  font-weight: 500;
 }
