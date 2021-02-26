@@ -38,6 +38,10 @@ text[href="http://simplemaps.com"] {
   margin: 0 auto;
 }
 
+#tt_sm_map {
+  z-index: 10000 !important;
+}
+
 
 /* 
  *  CHART STYLES
@@ -181,7 +185,7 @@ background-color: #4DBF3B;
   min-width: 20rem;
   max-width: 32rem;
   border: 2px solid #0B438C;
-  background-color: white;
+  background-color: #f7f7f7;
 }
 
 .pop-up div {
@@ -200,6 +204,10 @@ background-color: #4DBF3B;
   padding: 0.4rem 0.65rem;
   font-size: 0.75rem;
   font-weight: 700;
+}
+
+.pop-up .section .content .info:not(.flex-container) {
+  padding: 0.25rem 0.5rem;
 }
 
 .pop-up .section .content {
@@ -221,14 +229,14 @@ background-color: #4DBF3B;
 .pop-up .section .content .info {
   font-size: 0.85rem;
   font-weight: 600;
-  padding: 0.25rem 0.5rem;
+  /* padding: 0.25rem 0.5rem; */
 }
 
 .pop-up .section:first-child .content {
   color: #FC541F;
 }
 
-.pop-up .section:last-child .content .info {
+.section:last-child .info {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -237,4 +245,54 @@ background-color: #4DBF3B;
 
 .pop-up .section:last-child .content .info > div {
   font-weight: 500;
+}
+
+.section .content .icon > img {
+  width: 65%;
+}
+
+.pop-up .section:last-child .content {
+  color: black;
+  margin-bottom: 0.25rem;
+}
+
+.svg-icon, .svg-icon image {
+  width: 2.25rem;
+  height: 2.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.color-status-4 {
+  color: #4DBF3B;
+}
+  
+.color-status-3 {
+  color: #F83527;
+}
+  
+.color-status-2 {
+  color: #FC541F;
+}
+  
+.pop-up .section .flex-container {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: center;
+}
+
+.pop-up .section .flex-container div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+ 
+.pop-up .section .flex-container > div:first-child {
+  border-left: 2px solid #0B438C;
+  height: 100%;
+}
+
+.pop-up .section .flex-container .progress {
+  font-size: 2rem;
+  font-weight: 600;
 }

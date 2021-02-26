@@ -76,17 +76,24 @@ const createLocationsOnMap = (locations) => {
                     <div class="section">
                         <div class="title"> CENTRO PENINTENCIARO </div>
                         <div class="content">
-                            <div class="Icono"> Icon </div>
+                            <div class="icon"> <img src="./assets/icon-1.jpeg" /> </div>
                             <div class="info"> ${location.PenitenciarioCEDesc} </div>
                         </div>
                     </div>
                     <div class="section">
                         <div class="title"> RESULTADO GLOBAL </div>
                         <div class="content">
-                            <div class="icon"> Icon </div>
-                            <div class="info">
-                                <div>Icono</div>
-                                <div>${location.certificacionDesc || "Sin dato"}</div>
+                            <div class="icon"> <img src="./assets/icon-2.jpeg" /> </div>
+                            <div class="info color-status-${location.certificacionID} ${location.certificacionID === 4 ? 'flex-container' : "" }">
+                                <div> 
+                                    <svg class="svg-icon">
+                                        <image xlink:href<image xlink:href="./assets/icon-${location.certificacionID}.svg" src="="./assets/check.svg" width="90" height="90"/> .svg" src="yourfallback.png"/> 
+                                    </svg> 
+                                    ${location.certificacionID === 4 ? "<div>"+ location.certificacionDesc +"</div>" : ""}
+                                </div>
+                                <div>${ location.certificacionID === 4 
+                                        ?  "<div class='progress'>" + (location.porc * 100 || 0 ).toFixed(2) + "%</div>"
+                                        : location.certificacionDesc || "Sin dato"}</div>
                             </div>    
                         </div>
                     </div>
